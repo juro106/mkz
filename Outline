@@ -1,0 +1,125 @@
+function! Mokuji#ShowOutline() abort  1
+   2
+    " すでに Outline のウインドウがあったら閉じてリターン  3
+    if bufexists("Outline")  4
+        wincmd l  5
+        " save current number  6
+        let l:cnumber = line(".")  7
+        bw Outline  8
+        return  9
+    endif  10
+      11
+    " 現在開いているバッファ（ウインドウ）の処理  12
+    " 行（バッファ）の内容を取得  13
+    let l:lines = getline(1,"$")  14
+  15
+    if ! exists("b:outline_command")  16
+        call <SID>HeadingSet()  17
+    endif  18
+  19
+    " 新しいウインドウを開いてからの処理  20
+  21
+    " 新しいウインドウを開く  22
+    if ! exists("b:outline_width")  23
+        let b:outline_width=60  24
+    endif  25
+  26
+    " 右側に開く  27
+    setlocal splitright  28
+    exec "vertical ".b:outline_width." split Outline"  29
+  30
+    " silent! 1,$delete _  31
+  32
+    " 行番号を末尾に付与して書き出す  33
+    let l:i=1  34
+    while l:i < len(l:lines)+1  35
+        call setline(l:i,l:lines[l:i-1]."  ".l:i)  36
+        let l:i += 1  37
+    endwhile  38
+  39
+    " 見出しだけ抜き出して置換  40
+    for outcommand in l:outline_command  41
+        exec "silent!".outcommand  42
+    endfor  43
+    let l:header = ["", "▼ Heading"]  44
+    call append(0, l:header)  45
+  46
+    setlocal bt=nofile noswf  47
+    setlocal bufhidden=hide  48
+    setlocal textwidth=0  49
+  50
+    " 色を変える  51
+    exec 'syntax match OutlineHeaderMark /^▼/'  52
+    exec 'syntax match OutlineHeadingNum /Title\|H1\|\%(| \)\@<=H[1-6]/'  53
+    exec 'syntax match OutlineHeadingBold /\%(H[1-2] \)\@<=\(.*\)  /'  54
+    exec 'syntax match OutlineHeadingBold /\%(Title \)\@<=\(.*\)  /'  55
+    exec 'syntax match OutlineHeadingNormal /\%(H[3-6] \)\@<=\(.*\)  /'  56
+    exec 'syntax match OutlineDepth /^\(| \)\+/'  57
+    exec 'syntax match Hidden /\d\+$/'  58
+  59
+    hi! OutlineDepth guifg=#333333  60
+    hi! OutlineHeadingNum guifg=#222222 guibg=#999999 gui=bold  61
+    hi! OutlineHeadingBold gui=bold  62
+    hi! OutlineHeadingNormal guifg=#eeeeee  63
+    hi! def link OutlineHeaderMark vimFuncName  64
+    hi! Hidden guifg=#222222  65
+      66
+    nnoremap <silent> <buffer> <CR> :call <SID>JumpToHeading()<CR>  67
+    nnoremap <silent> <buffer> q :q<CR>  68
+  69
+    setlocal noma  70
+  71
+    "元の ウインドウへ戻る  72
+    wincmd h  73
+endfunction "}}}  74
+  75
+function! s:JumpToHeading() abort "{{{  76
+    let l:line = getline(".")  77
+    let l:jumpline = matchstr(l:line,'\d\+$')  78
+    wincmd p " 直前のウインドウへ移動する  79
+    exec l:jumpline  80
+    normal zz  81
+endfunction "}}}  82
+  83
+function! s:HeadingSet() abort "{{{  84
+    if (&ft == 'markdown' || &ft == 'md')  85
+        let b:outline_command=['g!/^title: \|^h1: \|^#\|^\s*<h[1-6]/d'  86
+            \, '%s/<\/h1>\|<\/h2>\|<\/h3>\|<\/h4>\|<\/h5>\|<\/h6>//'  87
+            \, '%s/title: /Title /'  88
+            \, '%s/h1: /# /'  89
+            \, "%s/'//g"  90
+            \, "%s/{.*}//g"  91
+            \, '%s/<h1\s[^>]*>/# /'  92
+            \, '%s/<h2\s[^>]*>/## /'  93
+            \, '%s/<h3\s[^>]*>/### /'  94
+            \, '%s/<h4\s[^>]*>/#### /'  95
+            \, '%s/<h5\s[^>]*>/##### /'  96
+            \, '%s/<h6\s[^>]*>/###### /'  97
+            \, '%s/^# /H1 /'  98
+            \, '%s/^## /| H2 /'  99
+            \, '%s/^### /| | H3 /'  100
+            \, '%s/^#### /| | | H4 /'  101
+            \, '%s/^##### /| | | | H5 /'  102
+            \, '%s/^###### /| | | | | H6 /'  103
+            \, ]  104
+    elseif (&ft == 'html')  105
+        let b:outline_command=['g!/^\s*\<h1\|<h2\|<h3\|<h4\|<h5\|<h6/d'  106
+            \, '%s/<\/h1>\|<\/h2>\|<\/h3>\|<\/h4>\|<\/h5>\|<\/h6>//'  107
+            \, '%s/<h1\s[^>]*>/# /'  108
+            \, '%s/<h2\s[^>]*>/## /'  109
+            \, '%s/<h3\s[^>]*>/### /'  110
+            \, '%s/<h4\s[^>]*>/#### /'  111
+            \, '%s/<h5\s[^>]*>/##### /'  112
+            \, '%s/<h6\s[^>]*>/###### /'  113
+            \, '%s/^# /H1 /'  114
+            \, '%s/^## /--H2 /'  115
+            \, '%s/^### /----H3 /'  116
+            \, '%s/^#### /------H4 /'  117
+            \, '%s/^##### /--------H5 /'  118
+            \, '%s/^###### /----------H6 /'  119
+            \, ]  120
+    else  121
+        echo 'これはmarkdownファイルでもないしhtmlファイルでもありません。'  122
+        let b:outline_command=['g!/^\*/d','%s/\[.\+\]//','%s/^\(\*\+\)\s*/\1/','%s/^\*//','%s/\*/  /g']  123
+    endif  124
+endfunction "}}}  125
