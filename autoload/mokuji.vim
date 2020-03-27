@@ -1,11 +1,11 @@
 function! Mokuji#ShowOutline() abort
  
     " すでに Outline のウインドウがあったら閉じてリターン
-    if bufexists("Outline")
+    if bufexists('[Outline]')
         wincmd l
         " save current number
         let l:cnumber = line(".")
-        bw Outline
+        bw [Outline]
         return
     endif
     
@@ -27,7 +27,7 @@ function! Mokuji#ShowOutline() abort
 
     " 右側に開く
     setlocal splitright
-    exec "vertical ".b:outline_width." split Outline"
+    exec "vertical ".b:outline_width." split [Outline]"
 
     " silent! 1,$delete _
 
@@ -51,12 +51,12 @@ function! Mokuji#ShowOutline() abort
     setlocal textwidth=0
 
     " 色を変える
-    exec 'syntax match OutlineHeaderMark /^ ▼/'
+    exec 'syntax match OutlineHeaderMark /^▼/'
     exec 'syntax match OutlineHeadingNum /Title\|H1\|\%(| \)\@<=H[1-6]/'
     exec 'syntax match OutlineHeadingBold /\%(H[1-2] \|Title \)\@<=\(.*\)  /'
     " exec 'syntax match OutlineHeadingBold /\%(Title \)\@<=\(.*\)  /'
     exec 'syntax match OutlineHeadingNormal /\%(H[3-6] \)\@<=\(.*\)  /'
-    exec 'syntax match OutlineDepth /^\( |\)\+/'
+    exec 'syntax match OutlineDepth /^\(| \)\+/'
     exec 'syntax match Hidden /\d\+$/'
 
     " hi! def link OutlineHeaderMark vimFuncName
@@ -106,13 +106,13 @@ function! s:HeadingSet() abort "{{{
             \, "%s/'//g"
             \, '%s/\"//g'
             \, "%s/{.*}//g"
-            \, '%s/title: / Title /'
-            \, '%s/^# / H1 /'
-            \, '%s/^## / | H2 /'
-            \, '%s/^### / | | H3 /'
-            \, '%s/^#### / | | | H4 /'
-            \, '%s/^##### / | | | | H5 /'
-            \, '%s/^###### / | | | | | H6 /'
+            \, '%s/title: /Title /'
+            \, '%s/^# /H1 /'
+            \, '%s/^## /| H2 /'
+            \, '%s/^### /| | H3 /'
+            \, '%s/^#### /| | | H4 /'
+            \, '%s/^##### /| | | | H5 /'
+            \, '%s/^###### /| | | | | H6 /'
             \, ]
     elseif (&ft == 'html')
         let b:outline_command=['g!/^\s*\<h1\|<h2\|<h3\|<h4\|<h5\|<h6/d'
@@ -134,11 +134,11 @@ function! s:HeadingSet() abort "{{{
             \, '%s/\v\<h5[^\>]*\>/##### /'
             \, '%s/\v\<h6[^\>]*\>/###### /'
             \, '%s/^# /H1 /'
-            \, '%s/^## /--H2 /'
-            \, '%s/^### /----H3 /'
-            \, '%s/^#### /------H4 /'
-            \, '%s/^##### /--------H5 /'
-            \, '%s/^###### /----------H6 /'
+            \, '%s/^## /| H2 /'
+            \, '%s/^### /| | H3 /'
+            \, '%s/^#### /| | | H4 /'
+            \, '%s/^##### /| | | | H5 /'
+            \, '%s/^###### /| | | | | H6 /'
             \, ]
     else
         let b:outline_command=['g!/^\*/d','%s/\[.\+\]//','%s/^\(\*\+\)\s*/\1/','%s/^\*//','%s/\*/  /g']

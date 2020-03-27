@@ -1,0 +1,1 @@
+mkzとは、markdownやhtmlファイルのHタグを拾って見出し一覧として表示せる vim plugin です。
