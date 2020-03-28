@@ -1,16 +1,11 @@
 function! Mokuji#ShowOutline() abort
- 
     " すでに Outline のウインドウがあったら閉じてリターン
-    if bufexists('[Outline]')
-        wincmd l
-        " save current number
-        let l:cnumber = line(".")
-        bw [Outline]
+    if bufexists('Outline')
+        call <SID>DeleteOutline()
         return
     endif
-    
     " 現在開いているバッファ（ウインドウ）の処理
-    " 行（バッファ）の内容を取得
+    " 全行の内容を取得
     let l:lines = getline(1,"$")
 
     if ! exists("b:outline_command")
@@ -18,16 +13,15 @@ function! Mokuji#ShowOutline() abort
     endif
 
     let l:outline_command = b:outline_command
-    " 新しいウインドウを開いてからの処理
 
-    " 新しいウインドウを開く
+    " 新しいウインドウを開いてからの処理
     if ! exists("b:outline_width")
         let b:outline_width=60
     endif
 
     " 右側に開く
     setlocal splitright
-    exec "vertical ".b:outline_width." split [Outline]"
+    exec "vertical ".b:outline_width." split Outline"
 
     " silent! 1,$delete _
 
@@ -45,6 +39,7 @@ function! Mokuji#ShowOutline() abort
     let l:header = ["", " ▼ Heading"]
     call append(0, l:header)
 
+    setlocal statusline=[OUTLINE]
     setlocal nonumber
     setlocal bt=nofile noswf
     setlocal bufhidden=hide
@@ -67,10 +62,13 @@ function! Mokuji#ShowOutline() abort
     hi! OutlineHeadingNormal guifg=#eeeeee
     hi! Hidden guifg=#222222
     
-    nnoremap <silent> <buffer> <CR> :call <SID>JumpToHeading()<CR>
-    nnoremap <silent> <buffer> q :q<CR>
+    nnoremap <silent> <buffer> <CR> :<C-u>call <SID>JumpToHeading()<CR>
+    nnoremap <silent> <buffer> q :<C-u>call <SID>DeleteOutline()<CR>
+    cnoremap <silent> <buffer> q <C-u>call <SID>DeleteOutline()<CR>
 
     setlocal noma
+    let l:flg = ""
+    echo flg
 
     "元の ウインドウへ戻る
     wincmd h
@@ -144,3 +142,10 @@ function! s:HeadingSet() abort "{{{
         let b:outline_command=['g!/^\*/d','%s/\[.\+\]//','%s/^\(\*\+\)\s*/\1/','%s/^\*//','%s/\*/  /g']
     endif
 endfunction "}}}
+
+function! s:DeleteOutline() abort
+    wincmd l
+    bw Outline
+    " let l:flg = "no"
+    " echo flg
+endfunction
