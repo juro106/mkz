@@ -4,7 +4,7 @@ I only have one thing to do.
 
 Show a list of headings.
 
-![screenshot](https://i.imgur.com/WeAYWpY.png)
+![ScreenShot](https://i.imgur.com/Tvrpbs2.png)
 
 ## Description
 
