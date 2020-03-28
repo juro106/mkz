@@ -14,7 +14,6 @@ The key mapping can be configuerd in your .vimrc
 nmap key <Plug>Mkz
 ```
 
-
 ### Mkzとは
 
-mkzとは、markdown(またはhtml)で目次を表示させる Vim Plugin です。複雑なことはしません。見出し一覧を表示させるだけです。
+mkzとは、markdown(またはhtml)で目次を表示する Vim Plugin です。複雑なことはしません。見出し一覧を表示させるだけです。

@@ -10,7 +10,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 if !exists(":Mkz")
-    command! -nargs=? Mkz call Mokuji#ShowOutline(<f-args>)
+    command! -nargs=? Mkz call Mkz#ToggleOutline(<f-args>)
 endif
 
 if !hasmapto('<Plug>Mkz')

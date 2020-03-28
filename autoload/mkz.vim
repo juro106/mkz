@@ -1,40 +1,33 @@
-function! Mokuji#ShowOutline() abort
-    " すでに Outline のウインドウがあったら閉じてリターン
+function! Mkz#ToggleOutline() abort
+    
     if bufexists('Outline')
         call <SID>DeleteOutline()
         return
     endif
-    " 現在開いているバッファ（ウインドウ）の処理
-    " 全行の内容を取得
+
     let l:lines = getline(1,"$")
 
-    if ! exists("b:outline_command")
+    if ! exists("b:regex_command")
         call <SID>HeadingSet()
     endif
 
-    let l:outline_command = b:outline_command
+    let l:regex_command = b:regex_command
 
-    " 新しいウインドウを開いてからの処理
     if ! exists("b:outline_width")
         let b:outline_width=60
     endif
 
-    " 右側に開く
     setlocal splitright
     exec "vertical ".b:outline_width." split Outline"
 
-    " silent! 1,$delete _
-
-    " 行番号を末尾に付与して書き出す
     let l:i=1
     while l:i < len(l:lines)+1
         call setline(l:i,l:lines[l:i-1]."  ".l:i)
         let l:i += 1
     endwhile
-
-    " 見出しだけ抜き出して置換
-    for outcommand in l:outline_command
-        exec "silent!".outcommand
+    
+    for cmd in l:regex_command
+        exec "silent!".cmd
     endfor
     let l:header = ["", " ▼ Heading"]
     call append(0, l:header)
@@ -45,16 +38,13 @@ function! Mokuji#ShowOutline() abort
     setlocal bufhidden=hide
     setlocal textwidth=0
 
-    " 色を変える
     exec 'syntax match OutlineHeaderMark /^▼/'
     exec 'syntax match OutlineHeadingNum /Title\|H1\|\%(| \)\@<=H[1-6]/'
     exec 'syntax match OutlineHeadingBold /\%(H[1-2] \|Title \)\@<=\(.*\)  /'
-    " exec 'syntax match OutlineHeadingBold /\%(Title \)\@<=\(.*\)  /'
     exec 'syntax match OutlineHeadingNormal /\%(H[3-6] \)\@<=\(.*\)  /'
     exec 'syntax match OutlineDepth /^\(| \)\+/'
     exec 'syntax match Hidden /\d\+$/'
-
-    " hi! def link OutlineHeaderMark vimFuncName
+    
     hi! def link OutlineHeaderMark Statement
     hi! OutlineDepth guifg=#333333
     hi! OutlineHeadingNum guifg=#222222 guibg=#999999 gui=bold
@@ -67,24 +57,23 @@ function! Mokuji#ShowOutline() abort
     cnoremap <silent> <buffer> q <C-u>call <SID>DeleteOutline()<CR>
 
     setlocal noma
-    let l:flg = ""
-    echo flg
 
-    "元の ウインドウへ戻る
+    echo "open"
+    
     wincmd h
-endfunction "}}}
+endfunction
 
-function! s:JumpToHeading() abort "{{{
+function! s:JumpToHeading() abort
     let l:line = getline(".")
     let l:jumpline = matchstr(l:line,'\d\+$')
-    wincmd p " 直前のウインドウへ移動する
+    wincmd p
     exec l:jumpline
     normal zz
-endfunction "}}}
+endfunction
 
-function! s:HeadingSet() abort "{{{
+function! s:HeadingSet() abort
     if (&ft == 'markdown' || &ft == 'md')
-        let b:outline_command=['g!/^title: \|^h1: \|^#\|^\s*<h[1-6]/d'
+        let b:regex_command=['g!/^title: \|^h1: \|^#\|^\s*<h[1-6]/d'
             \, '%s/<\/h1>\|<\/h2>\|<\/h3>\|<\/h4>\|<\/h5>\|<\/h6>//'
             \, '%s/\v\<a [^\>]*\>//'
             \, '%s/<\/a>//'
@@ -113,7 +102,7 @@ function! s:HeadingSet() abort "{{{
             \, '%s/^###### /| | | | | H6 /'
             \, ]
     elseif (&ft == 'html')
-        let b:outline_command=['g!/^\s*\<h1\|<h2\|<h3\|<h4\|<h5\|<h6/d'
+        let b:regex_command=['g!/^\s*\<h1\|<h2\|<h3\|<h4\|<h5\|<h6/d'
             \, '%s/<\/h1>\|<\/h2>\|<\/h3>\|<\/h4>\|<\/h5>\|<\/h6>//'
             \, '%s/\v\<a[^\>]*\>//'
             \, '%s/<\/a>//'
@@ -139,13 +128,12 @@ function! s:HeadingSet() abort "{{{
             \, '%s/^###### /| | | | | H6 /'
             \, ]
     else
-        let b:outline_command=['g!/^\*/d','%s/\[.\+\]//','%s/^\(\*\+\)\s*/\1/','%s/^\*//','%s/\*/  /g']
+        let b:regex_command=['g!/^\*/d','%s/\[.\+\]//','%s/^\(\*\+\)\s*/\1/','%s/^\*//','%s/\*/  /g']
     endif
-endfunction "}}}
+endfunction
 
 function! s:DeleteOutline() abort
     wincmd l
     bw Outline
-    " let l:flg = "no"
-    " echo flg
+    echo "close"
 endfunction
