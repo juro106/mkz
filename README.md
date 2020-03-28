@@ -1,8 +1,8 @@
-# Mkz: simple outline viewer for Vim in only markdown(html)
+# Mkz
 
 ## Description
 
-Simple Vim plugin for show outline(Table of Contents) in markdown or html.
+simple outline(Table of Contents) viewer for Vim in only markdown(html)
 
 ## Quickstart
 
@@ -14,6 +14,6 @@ The key mapping can be configuerd in your .vimrc
 nmap key <Plug>Mkz
 ```
 
-### Mkzとは
+## Mkzとは
 
 mkzとは、markdown(またはhtml)で目次を表示する Vim Plugin です。複雑なことはしません。見出し一覧を表示させるだけです。
