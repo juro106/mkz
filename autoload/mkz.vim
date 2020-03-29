@@ -34,9 +34,9 @@ function! Mkz#ToggleOutline() abort
 
     setlocal statusline=[OUTLINE]
     setlocal nonumber
-    setlocal bt=nofile noswf
-    setlocal bufhidden=hide
-    setlocal textwidth=0
+    setlocal buftype=nofile
+    setlocal noswf
+    setlocal bufhidden=unload
 
     exec 'syntax match OutlineHeaderMark /^▼/'
     exec 'syntax match OutlineHeadingNum /Title\|H1\|\%(| \)\@<=H[1-6]/'
@@ -56,9 +56,17 @@ function! Mkz#ToggleOutline() abort
     nnoremap <silent> <buffer> q :<C-u>call <SID>DeleteOutline()<CR>
     cnoremap <silent> <buffer> q <C-u>call <SID>DeleteOutline()<CR>
 
-    setlocal noma
+    augroup outline
+        autocmd!
+        autocmd Bufleave <buffer> setlocal nobuflisted
+        autocmd VimLeavePre <buffer> setlocal nobuflisted
+        autocmd WinEnter * if (winnr("$") == 1) && (getbufvar(winbufnr(0), '&buftype')) == 'nofile' | quit | endif
+    augroup END
 
-    echo "open"
+    setlocal nomodifiable
+    setlocal readonly
+
+    " echo 'open'
     
     wincmd h
 endfunction
@@ -132,5 +140,11 @@ endfunction
 function! s:DeleteOutline() abort
     wincmd l
     bw Outline
-    echo "close"
+    " echo 'close'
+endfunction
+
+function! s:AllClose() abort
+    wincmd l
+    bw Outline
+    bd
 endfunction
