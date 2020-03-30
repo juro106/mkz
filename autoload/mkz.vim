@@ -5,20 +5,29 @@ function! Mkz#ToggleOutline() abort
         return
     endif
 
+    if !exists("l:mkz_open_left")
+        let mkz_open_left = 0
+    endif
+    if !exists("l:mkz_focus")
+        let mkz_focus = 0
+    endif
+
+    if !exists("l:mkz_width")
+        let l:mkz_width=60
+    endif
+
     let l:lines = getline(1,"$")
 
-    if ! exists("b:regex_command")
+    if !exists("b:regex_command")
         call <SID>HeadingSet()
     endif
 
     let l:regex_command = b:regex_command
 
-    if ! exists("b:outline_width")
-        let b:outline_width=60
+    if l:mkz_open_left == 0
+        setlocal splitright
     endif
-
-    setlocal splitright
-    exec "vertical ".b:outline_width." split Outline"
+    exec "vertical ".l:mkz_width." split Outline"
 
     let l:i=1
     while l:i < len(l:lines)+1
@@ -33,25 +42,12 @@ function! Mkz#ToggleOutline() abort
     call append(0, l:header)
 
     setlocal statusline=[OUTLINE]
+    setlocal filetype=mkz
     setlocal nonumber
     setlocal buftype=nofile
     setlocal noswf
     setlocal bufhidden=unload
 
-    exec 'syntax match OutlineHeaderMark /^▼/'
-    exec 'syntax match OutlineHeadingNum /Title\|H1\|\%(| \)\@<=H[1-6]/'
-    exec 'syntax match OutlineHeadingBold /\%(H[1-2] \|Title \)\@<=\(.*\)  /'
-    exec 'syntax match OutlineHeadingNormal /\%(H[3-6] \)\@<=\(.*\)  /'
-    exec 'syntax match OutlineDepth /^\(| \)\+/'
-    exec 'syntax match Hidden /\d\+$/'
-    
-    hi! def link OutlineHeaderMark Statement
-    hi! OutlineDepth guifg=#333333
-    hi! OutlineHeadingNum guifg=#222222 guibg=#999999 gui=bold
-    hi! def link OutlineHeadingBold Title
-    hi! OutlineHeadingNormal guifg=#eeeeee
-    hi! Hidden guifg=#222222
-    
     nnoremap <silent> <buffer> <CR> :<C-u>call <SID>JumpToHeading()<CR>
     nnoremap <silent> <buffer> q :<C-u>call <SID>DeleteOutline()<CR>
     cnoremap <silent> <buffer> q <C-u>call <SID>DeleteOutline()<CR>
@@ -68,12 +64,20 @@ function! Mkz#ToggleOutline() abort
 
     " echo 'open'
     
-    wincmd h
+    if l:mkz_open_left==0 && l:mkz_focus==0
+        wincmd h
+    elseif l:mkz_open_left==0 && l:mkz_focus==1
+        wincmd l 
+    elseif l:mkz_open_left==1 && l:mkz_focus==0
+        wincmd l
+    elseif l:mkz_open_left==1 && l:mkz_focus==1
+        wincmd h 
+    endif
 endfunction
 
 function! s:JumpToHeading() abort
     let l:line = getline(".")
-    let l:jumpline = matchstr(l:line,'\d\+$')
+    let l:jumpline = matchstr(l:line, '\d\+$')
     wincmd p
     exec l:jumpline
     normal zz
@@ -138,13 +142,6 @@ function! s:HeadingSet() abort
 endfunction
 
 function! s:DeleteOutline() abort
-    wincmd l
     bw Outline
     " echo 'close'
-endfunction
-
-function! s:AllClose() abort
-    wincmd l
-    bw Outline
-    bd
 endfunction
