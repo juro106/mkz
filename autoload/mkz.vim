@@ -62,8 +62,6 @@ function! Mkz#ToggleOutline() abort
     setlocal nomodifiable
     setlocal readonly
 
-    " echo 'open'
-    
     if l:mkz_open_left==0 && l:mkz_focus==0
         wincmd h
     elseif l:mkz_open_left==0 && l:mkz_focus==1
@@ -73,6 +71,8 @@ function! Mkz#ToggleOutline() abort
     elseif l:mkz_open_left==1 && l:mkz_focus==1
         wincmd h 
     endif
+    
+    " echo 'open' 
 endfunction
 
 function! s:JumpToHeading() abort
