@@ -11,10 +11,17 @@ syn match OutlineDepth '^\(| \)\+'
 syn match Hidden '\d\+$'
 
 hi def link OutlineHeaderMark Statement
-hi OutlineDepth guifg=#333333
-hi OutlineHeadingNum guifg=#222222 guibg=#999999 gui=bold
 hi def link OutlineHeadingBold Title
-hi OutlineHeadingNormal guifg=#eeeeee
-hi Hidden guifg=#222222
+if &background ==# 'dark'
+    hi OutlineDepth guifg=#333333
+    hi OutlineHeadingNum guifg=#222222 guibg=#999999 gui=bold
+    hi OutlineHeadingNormal guifg=#eeeeee
+    hi Hidden guifg=#222222
+else
+    hi OutlineDepth guifg=#e9e9e9
+    hi OutlineHeadingNum guifg=#555555 guibg=#eeeeee gui=bold
+    hi def link OutlineHeadingNormal String
+    hi Hidden guifg=#efefef
+endif
 
 let b:current_syntax = 'mkz'

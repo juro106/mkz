@@ -36,7 +36,6 @@ let l:mkz_open_left=1
 let l:mkz_focus=1
 ```
 
-
 ## Mkzとは
 
 markdown(またはhtml)で目次を表示するためだけに存在するVim Plugin です。
