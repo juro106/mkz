@@ -28,11 +28,11 @@ if you do this the F8 key will toggle the Outline window.
 
 example:
 ```vim
-" window width (default 60)
+" if you want to change width (# default: 60)
 let l:mkz_width=100
-" window open left or right ( default -> 0(right), left -> 1 ) 
+" if you want to open window left (# default: 0)
 let l:mkz_open_left=1
-" window focus ( default -> 0(stay), focus new window -> 1 )
+" if you want to focus new window (# default: 0)
 let l:mkz_focus=1
 ```
 
