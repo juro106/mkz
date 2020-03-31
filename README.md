@@ -20,9 +20,22 @@ The key mapping can be configuerd in your .vimrc
 
 example:
 ```vim
-nmap <F8> <Plug>Mkz
+nmap <F8> <Plug>(mkz-toggle)
 ```
 if you do this the F8 key will toggle the Outline window.
+
+## Setting
+
+example:
+```vim
+" window width (default 60)
+let l:mkz_width=100
+" window open left or right ( default -> 0(right), left -> 1 ) 
+let l:mkz_open_left=1
+" window focus ( default -> 0(stay), focus new window -> 1 )
+let l:mkz_focus=1
+```
+
 
 ## Mkzとは
 

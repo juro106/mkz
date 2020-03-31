@@ -14,9 +14,9 @@ if !exists(":Mkz")
 endif
 
 if !hasmapto('<Plug>Mkz')
-    nmap <silent> <F10> <Plug>Mkz
+    nmap <silent> <F10> <Plug>(mkz-toggle)
 endif
-nnoremap <Plug>Mkz :<C-u>Mkz<CR>
+nnoremap <Plug>(mkz-toggle) :<C-u>Mkz<CR>
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
